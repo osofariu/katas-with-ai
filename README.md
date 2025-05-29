@@ -30,3 +30,9 @@ At the end it wrote a corner-case test for the end of the game, which was cool, 
 The other nice thing about this model is that it oferred to do the refactor without being prompted.
 
 I think this problem is very well understood to models.  I will have to try something it hasn't seen before to see how it does.
+
+## Mars Rover
+
+This is some random kata I found.  This is a good kata for an an AI agent because the solution is a bit repetitive - the same logic applies in all directions.  The solution may not be the shortest, but it's easy to follow.
+
+Claude-4 did pretty well, but I did have to remind it once to stop after implementing the tests.

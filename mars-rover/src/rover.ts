@@ -1,11 +1,16 @@
 type Direction = "N" | "S" | "E" | "W";
 type Position = { x: number; y: number };
+type CommandResult = {
+  obstacleEncountered: boolean;
+  obstaclePosition?: Position;
+};
 
 export class Rover {
   private position: Position;
   private direction: Direction;
   private readonly gridWidth: number;
   private readonly gridHeight: number;
+  private obstacles: Position[];
 
   constructor(
     x: number,
@@ -19,6 +24,7 @@ export class Rover {
     this.direction = direction;
     this.gridWidth = width;
     this.gridHeight = height;
+    this.obstacles = obstacles;
   }
 
   getPosition(): Position {
@@ -29,57 +35,86 @@ export class Rover {
     return this.direction;
   }
 
-  executeCommands(commands: string[]): void {
+  executeCommands(commands: string[]): CommandResult {
     for (const command of commands) {
+      let result: CommandResult;
+
       switch (command) {
         case "f":
-          this.moveForward();
+          result = this.moveForward();
           break;
         case "b":
-          this.moveBackward();
+          result = this.moveBackward();
           break;
         case "l":
           this.turnLeft();
+          result = { obstacleEncountered: false };
           break;
         case "r":
           this.turnRight();
+          result = { obstacleEncountered: false };
+          break;
+        default:
+          result = { obstacleEncountered: false };
           break;
       }
+
+      if (result.obstacleEncountered) {
+        return result;
+      }
     }
+
+    return { obstacleEncountered: false };
   }
 
-  private moveForward(): void {
-    switch (this.direction) {
-      case "N":
-        this.position.y = this.wrapY(this.position.y + 1);
-        break;
-      case "S":
-        this.position.y = this.wrapY(this.position.y - 1);
-        break;
-      case "E":
-        this.position.x = this.wrapX(this.position.x + 1);
-        break;
-      case "W":
-        this.position.x = this.wrapX(this.position.x - 1);
-        break;
-    }
+  private moveForward(): CommandResult {
+    const newPosition = this.calculateNewPosition(1);
+    return this.attemptMove(newPosition);
   }
 
-  private moveBackward(): void {
+  private moveBackward(): CommandResult {
+    const newPosition = this.calculateNewPosition(-1);
+    return this.attemptMove(newPosition);
+  }
+
+  private calculateNewPosition(multiplier: number): Position {
+    let newX = this.position.x;
+    let newY = this.position.y;
+
     switch (this.direction) {
       case "N":
-        this.position.y = this.wrapY(this.position.y - 1);
+        newY = this.wrapY(this.position.y + multiplier);
         break;
       case "S":
-        this.position.y = this.wrapY(this.position.y + 1);
+        newY = this.wrapY(this.position.y - multiplier);
         break;
       case "E":
-        this.position.x = this.wrapX(this.position.x - 1);
+        newX = this.wrapX(this.position.x + multiplier);
         break;
       case "W":
-        this.position.x = this.wrapX(this.position.x + 1);
+        newX = this.wrapX(this.position.x - multiplier);
         break;
     }
+
+    return { x: newX, y: newY };
+  }
+
+  private attemptMove(newPosition: Position): CommandResult {
+    if (this.hasObstacle(newPosition)) {
+      return {
+        obstacleEncountered: true,
+        obstaclePosition: newPosition,
+      };
+    }
+
+    this.position = newPosition;
+    return { obstacleEncountered: false };
+  }
+
+  private hasObstacle(position: Position): boolean {
+    return this.obstacles.some(
+      (obstacle) => obstacle.x === position.x && obstacle.y === position.y
+    );
   }
 
   private wrapX(x: number): number {

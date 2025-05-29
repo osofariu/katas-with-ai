@@ -140,4 +140,86 @@ describe("Rover", () => {
       expect(rover.getPosition()).toEqual({ x: 1, y: 1 });
     });
   });
+
+  describe("Obstacle detection", () => {
+    it("should stop at obstacle and report it", () => {
+      const obstacles = [{ x: 1, y: 2 }];
+      const rover = new Rover(1, 1, "N", obstacles);
+
+      const result = rover.executeCommands(["f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 1, y: 1 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 1, y: 2 });
+    });
+
+    it("should move up to obstacle and stop command sequence", () => {
+      const obstacles = [{ x: 1, y: 3 }];
+      const rover = new Rover(1, 1, "N", obstacles);
+
+      const result = rover.executeCommands(["f", "f", "f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 1, y: 2 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 1, y: 3 });
+    });
+
+    it("should complete sequence when no obstacles encountered", () => {
+      const obstacles = [{ x: 3, y: 3 }];
+      const rover = new Rover(1, 1, "N", obstacles);
+
+      const result = rover.executeCommands(["f", "r", "f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 2, y: 2 });
+      expect(result.obstacleEncountered).toBe(false);
+      expect(result.obstaclePosition).toBeUndefined();
+    });
+
+    it("should detect obstacle on backward movement", () => {
+      const obstacles = [{ x: 1, y: 1 }];
+      const rover = new Rover(1, 2, "N", obstacles);
+
+      const result = rover.executeCommands(["b"]);
+
+      expect(rover.getPosition()).toEqual({ x: 1, y: 2 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 1, y: 1 });
+    });
+
+    it("should detect obstacle across wrapped edge", () => {
+      const obstacles = [{ x: 1, y: 1 }];
+      const rover = new Rover(1, 4, "N", obstacles);
+
+      const result = rover.executeCommands(["f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 1, y: 4 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 1, y: 1 });
+    });
+
+    it("should detect multiple obstacles in sequence", () => {
+      const obstacles = [
+        { x: 2, y: 1 },
+        { x: 1, y: 3 },
+      ];
+      const rover = new Rover(1, 1, "E", obstacles);
+
+      const result = rover.executeCommands(["f", "l", "f", "f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 1, y: 1 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 2, y: 1 });
+    });
+
+    it("should detect obstacle in custom grid size", () => {
+      const obstacles = [{ x: 1, y: 1 }];
+      const rover = new Rover(3, 1, "E", obstacles, 3, 3);
+
+      const result = rover.executeCommands(["f"]);
+
+      expect(rover.getPosition()).toEqual({ x: 3, y: 1 });
+      expect(result.obstacleEncountered).toBe(true);
+      expect(result.obstaclePosition).toEqual({ x: 1, y: 1 });
+    });
+  });
 });

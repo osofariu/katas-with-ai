@@ -9,21 +9,19 @@
     "pretest": "npm run lint"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.6",
-    "jest": "^21.2.1",
-    "ts-jest": "^21.2.2",
-    "tslint": "^5.9.1"
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "tslint": "^5.9.1",
+    "typescript": "^5.3.3"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.ts"
     ],
-    "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "(\\.|/)(test|spec)\\.(js?|ts?)$",
     "testPathIgnorePatterns": [
       "/node_modules/"
     ]
@@ -31,8 +29,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/wouterla/TopGearKata"
-  },
-  "dependencies": {
-    "typescript": "^2.6.1"
   }
 }

@@ -1,4 +1,4 @@
-import { Item } from "item";
+import { Item } from "./item";
 
 class Shop {
   public items: Item[];
